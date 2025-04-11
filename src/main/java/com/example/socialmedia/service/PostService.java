@@ -1,28 +1,28 @@
 package com.example.socialmedia.service;
 
 import com.example.socialmedia.dto.PostDTO;
+import com.example.socialmedia.dto.UserDTO;
 import com.example.socialmedia.entity.Post;
 import com.example.socialmedia.entity.User;
 import com.example.socialmedia.mapper.PostMapper;
+import com.example.socialmedia.mapper.UserMapper;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostMapper postMapper;
-
-    public PostService(PostRepository postRepository, UserRepository userRepository, PostMapper postMapper) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.postMapper = postMapper;
-    }
+    private final UserMapper userMapper;
 
     public List<PostDTO> getAllPosts() {
         return postRepository.findAll()
@@ -47,5 +47,19 @@ public class PostService {
         postRepository.save(post);
 
         return postMapper.toDTO(post);
+    }
+
+    public PostDTO getPostById(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return postMapper.toDTO(post);
+    }
+
+    public Set<UserDTO> getLikes(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return post.getLikes().stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toSet());
     }
 }

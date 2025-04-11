@@ -1,12 +1,15 @@
 package com.example.socialmedia.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"followers", "following"}) // Exclude followers and following from toString()
+@EqualsAndHashCode(exclude = {"followers", "following"}) // Exclude followers and following from equals() and hashCode()
 @Entity
 @Table(name = "users")
 public class User {
@@ -18,16 +21,16 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column//(nullable = false)
+    @Column(nullable = false)
     private String email;
 
-    @Column//(nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column//(nullable = false)
+    @Column(nullable = false)
     private String firstName;
 
-    @Column//(nullable = false)
+    @Column(nullable = false)
     private String lastName;
 
     @ManyToMany
@@ -37,4 +40,17 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
     private Set<User> followers = new HashSet<>();
+
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> following = new HashSet<>();
+
+    public void addFollower(User follower) {
+        this.followers.add(follower);
+        follower.getFollowing().add(this);
+    }
+
+    public void addFollowing(User following) {
+        this.following.add(following);
+        following.getFollowers().add(this);
+    }
 }

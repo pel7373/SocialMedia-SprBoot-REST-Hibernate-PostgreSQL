@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public interface UserMapper {
 
     // Map "Set<User> followers" to "Set<String> followers" in UserDTO
-    @Mapping(target = "followers", expression = "java(user.getFollowers().stream().map(User::getUsername).collect(java.util.stream.Collectors.toSet()))")
+    @Mapping(target = "followers", expression = "java(user.getFollowers() != null ? user.getFollowers().stream().map(User::getUsername).collect(java.util.stream.Collectors.toSet()) : null)")
     UserDTO toDTO(User user);
 
     // Map "Set<String> followers" to "Set<User> followers" using a custom method

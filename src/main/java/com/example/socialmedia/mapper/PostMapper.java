@@ -15,7 +15,7 @@ public interface PostMapper {
 
     // Map the nested property "author.username" to "author" in PostDTO
     @Mapping(target = "author", source = "author.username")
-    @Mapping(target = "likes", expression = "java(post.getLikes().stream().map(user -> user.getUsername()).collect(java.util.stream.Collectors.toSet()))")
+    @Mapping(target = "likes", expression = "java(post.getLikes() != null ? post.getLikes().stream().map(user -> user.getUsername()).collect(java.util.stream.Collectors.toSet()) : null)")
     PostDTO toDTO(Post post);
 
     // Map "String author" to "User author" using a custom method
@@ -23,7 +23,6 @@ public interface PostMapper {
     @Mapping(target = "likes", source = "likes", qualifiedByName = "mapUsernamesToUsers")
     Post toEntity(PostDTO postDTO);
 
-    // Custom method to map "String username" to "User"
     @Named("mapUsernameToUser")
     default User mapUsernameToUser(String username) {
         if (username == null) {
@@ -34,7 +33,6 @@ public interface PostMapper {
         return user;
     }
 
-    // Custom method to map "Set<String> usernames" to "Set<User>"
     @Named("mapUsernamesToUsers")
     default Set<User> mapUsernamesToUsers(Set<String> usernames) {
         if (usernames == null) {
